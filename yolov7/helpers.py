@@ -18,25 +18,13 @@ from yolov7.utils.google_utils import attempt_download_from_hub, attempt_downloa
 from yolov7.utils.torch_utils import TracedModel
 
 
-def load_model(model_path, autoshape=True, device='cpu', trace=False, size=640, half=False, hf_model=False):
-    """
-    Creates a specified YOLOv7 model
-    Arguments:
-        model_path (str): path of the model
-        device (str): select device that model will be loaded (cpu, cuda)
-        trace (bool): if True, model will be traced
-        size (int): size of the input image
-        half (bool): if True, model will be in half precision
-        hf_model (bool): if True, model will be loaded from huggingface hub    
-    Returns:
-        pytorch model
-    (Adapted from yolov7.hubconf.create)
-    """
+def load_model(model_path_or_buffer, autoshape=True, device='cpu', trace=False, size=640, half=False, hf_model=False):
+    # Adapted so model_file can be file_like object (weights in memory) or path to weights on disk
     if hf_model:
-        model_file = attempt_download_from_hub(model_path)
+        model_file = attempt_download_from_hub(model_path_or_buffer)
     else:
-        model_file = attempt_download(model_path)
-    
+        model_file = model_path_or_buffer  # Directly pass the file-like object or path
+
     model = attempt_load(model_file, map_location=device)
     if trace:
         model = TracedModel(model, device, size)
@@ -48,6 +36,7 @@ def load_model(model_path, autoshape=True, device='cpu', trace=False, size=640, 
         model.half()
 
     return model
+
 
 
 if __name__ == "__main__":
