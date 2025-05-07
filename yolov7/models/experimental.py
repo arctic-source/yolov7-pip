@@ -246,7 +246,7 @@ def attempt_load(weights, map_location=None):
     weights = [weights] if not isinstance(weights, list) else weights
     for w in weights:
         if hasattr(w, 'read'):  # Check if w is a file-like object
-            ckpt = torch.load(w, map_location=map_location)  # Load from file-like object
+            ckpt = torch.load(w, map_location=map_location, weights_only=False)  # Load from file-like object
         else:
             ckpt = torch.load(w, map_location=map_location)  # Load from file path
         model.append(ckpt['ema' if ckpt.get('ema') else 'model'].float().fuse().eval())
